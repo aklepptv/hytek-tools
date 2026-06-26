@@ -128,7 +128,7 @@ def _parse_age(value: str) -> int | None:
 
 def _collect_unknown_fields(raw_text: str) -> tuple[UnknownField, ...]:
     """Return every byte range not covered by decoded D1 fields."""
-    decoded = set()
+    decoded: set[int] = set()
     for start, end in _DECODED_RANGES:
         decoded.update(range(start, min(end, len(raw_text))))
 

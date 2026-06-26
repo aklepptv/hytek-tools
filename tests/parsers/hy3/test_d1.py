@@ -78,7 +78,9 @@ def test_decode_d1_accepts_reader_record() -> None:
 
 
 def test_decode_d1_from_sample_file(sample_path: Path) -> None:
-    d1_records = [record for record in HY3Reader(sample_path).read() if record.record_type == "D1"]
+    d1_records = [
+        record for record in HY3Reader(sample_path).read() if record.record_type == "D1"
+    ]
 
     assert len(d1_records) == 2
 
@@ -88,7 +90,10 @@ def test_decode_d1_from_sample_file(sample_path: Path) -> None:
     assert swimmers[0].gender is Gender.MALE
     assert swimmers[1].last_name == "Lee"
     assert swimmers[1].gender is Gender.FEMALE
-    assert all(swimmer.raw_text == record.raw_text for swimmer, record in zip(swimmers, d1_records))
+    assert all(
+        swimmer.raw_text == record.raw_text
+        for swimmer, record in zip(swimmers, d1_records, strict=True)
+    )
 
 
 def test_decode_d1_preserves_unknown_field_bytes() -> None:
@@ -124,9 +129,7 @@ def test_decode_d1_unknown_fields_reconstruct_raw_line() -> None:
         for start, end in _DECODED_RANGES:
             pieces[(start, end)] = raw_text[start:end]
 
-        reconstructed = "".join(
-            pieces[(start, end)] for start, end in sorted(pieces)
-        )
+        reconstructed = "".join(pieces[(start, end)] for start, end in sorted(pieces))
         assert reconstructed == raw_text
 
 

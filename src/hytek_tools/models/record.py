@@ -27,6 +27,5 @@ class Record:
     def __repr__(self) -> str:
         holder = self.swimmer or self.holder_name or "unknown"
         return (
-            f"Record({self.record_type!r}, time={self.time!r}, "
-            f"holder={holder!r})"
+            f"Record({self.record_type!r}, time={self.time!r}, " f"holder={holder!r})"
         )

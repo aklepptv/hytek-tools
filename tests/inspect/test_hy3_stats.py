@@ -44,14 +44,7 @@ def test_count_record_types_blank_line(tmp_path: Path) -> None:
 def test_format_record_counts() -> None:
     output = format_record_counts({"D0": 1, "D1": 68, "D3": 42, "E0": 84})
 
-    assert output == (
-        "Record counts\n"
-        "\n"
-        "D0 1\n"
-        "D1 68\n"
-        "D3 42\n"
-        "E0 84\n"
-    )
+    assert output == ("Record counts\n" "\n" "D0 1\n" "D1 68\n" "D3 42\n" "E0 84\n")
 
 
 def test_format_record_counts_empty() -> None:

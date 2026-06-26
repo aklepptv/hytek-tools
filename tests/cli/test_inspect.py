@@ -21,14 +21,7 @@ def test_inspect_command(tmp_path: Path, capsys) -> None:
 
     captured = capsys.readouterr()
     assert exit_code == 0
-    assert captured.out == (
-        "Record counts\n"
-        "\n"
-        "D0 1\n"
-        "D1 2\n"
-        "D3 1\n"
-        "E0 1\n"
-    )
+    assert captured.out == ("Record counts\n" "\n" "D0 1\n" "D1 2\n" "D3 1\n" "E0 1\n")
     assert captured.err == ""
 
 
