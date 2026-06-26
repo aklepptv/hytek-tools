@@ -8,6 +8,10 @@ from pathlib import Path
 
 from hytek_tools.inspect.hy3_dump import HY3RecordInspector, format_dump
 from hytek_tools.inspect.hy3_stats import count_record_types, format_record_counts
+from hytek_tools.teamunify.match_report import (
+    build_match_report_from_files,
+    format_match_report,
+)
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -33,12 +37,42 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="path to an HY3 meet file",
     )
+
+    match_report_parser = subparsers.add_parser(
+        "match-report",
+        help="match CL2 swimmers to a TeamUnify roster",
+    )
+    match_report_parser.add_argument(
+        "--cl2",
+        type=Path,
+        required=True,
+        help="path to a CL2 meet file",
+    )
+    match_report_parser.add_argument(
+        "--roster",
+        type=Path,
+        required=True,
+        help="path to a TeamUnify roster CSV export",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "match-report":
+        cl2_path: Path = args.cl2
+        roster_path: Path = args.roster
+        if not cl2_path.is_file():
+            print(f"error: file not found: {cl2_path}", file=sys.stderr)
+            return 1
+        if not roster_path.is_file():
+            print(f"error: file not found: {roster_path}", file=sys.stderr)
+            return 1
+        report = build_match_report_from_files(cl2_path, roster_path)
+        sys.stdout.write(format_match_report(report))
+        return 0
 
     path: Path = args.file
     if not path.is_file():
