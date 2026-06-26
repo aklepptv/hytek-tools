@@ -7,6 +7,10 @@ import sys
 from pathlib import Path
 
 from hytek_tools.inspect.cl2_diff import compare_cl2_files, format_cl2_diff
+from hytek_tools.inspect.cl2_swimmer_diff import (
+    compare_swimmer_d01_records,
+    format_cl2_swimmer_diff,
+)
 from hytek_tools.inspect.cl2_trace import format_cl2_trace, trace_cl2_swimmer
 from hytek_tools.inspect.hy3_dump import HY3RecordInspector, format_dump
 from hytek_tools.inspect.hy3_stats import count_record_types, format_record_counts
@@ -202,6 +206,28 @@ def _build_parser() -> argparse.ArgumentParser:
         required=True,
         help='swimmer name query, for example "Nathan Kleppinger"',
     )
+
+    diff_swimmer_parser = subparsers.add_parser(
+        "diff-swimmer",
+        help="compare D01 records for one swimmer between two CL2 files",
+    )
+    diff_swimmer_parser.add_argument(
+        "--before",
+        type=Path,
+        required=True,
+        help="path to the original CL2 meet file",
+    )
+    diff_swimmer_parser.add_argument(
+        "--after",
+        type=Path,
+        required=True,
+        help="path to the updated CL2 meet file",
+    )
+    diff_swimmer_parser.add_argument(
+        "--name",
+        required=True,
+        help='swimmer name query, for example "Nathan Kleppinger"',
+    )
     return parser
 
 
@@ -238,6 +264,27 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {error}", file=sys.stderr)
             return 1
         sys.stdout.write(format_cl2_trace(trace_report))
+        return 0
+
+    if args.command == "diff-swimmer":
+        diff_before_path: Path = args.before
+        diff_after_path: Path = args.after
+        if not diff_before_path.is_file():
+            print(f"error: file not found: {diff_before_path}", file=sys.stderr)
+            return 1
+        if not diff_after_path.is_file():
+            print(f"error: file not found: {diff_after_path}", file=sys.stderr)
+            return 1
+        try:
+            swimmer_diff_report = compare_swimmer_d01_records(
+                diff_before_path,
+                diff_after_path,
+                args.name,
+            )
+        except ValueError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
+        sys.stdout.write(format_cl2_swimmer_diff(swimmer_diff_report))
         return 0
 
     if args.command == "diff-cl2":
