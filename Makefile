@@ -1,22 +1,29 @@
+PYTHON := .venv/bin/python
+PIP := .venv/bin/pip
+PYTEST := .venv/bin/pytest
+RUFF := .venv/bin/ruff
+BLACK := .venv/bin/black
+MYPY := .venv/bin/mypy
+
 .PHONY: dev test lint format typecheck check
 
 dev:
-	pip install -e ".[dev]"
+	$(PIP) install -e ".[dev]"
 
 test:
-	pytest
+	$(PYTEST)
 
 lint:
-	ruff check .
+	$(RUFF) check .
 
 format:
-	black .
+	$(BLACK) .
 
 typecheck:
-	mypy src
+	$(MYPY) src
 
 check:
-	ruff check .
-	black --check .
-	mypy src
-	pytest
+	$(RUFF) check .
+	$(BLACK) --check .
+	$(MYPY) src
+	$(PYTEST)
