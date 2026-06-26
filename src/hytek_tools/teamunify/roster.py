@@ -6,9 +6,13 @@ import csv
 from collections import defaultdict
 from datetime import date, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from hytek_tools.models.enums import Gender
 from hytek_tools.teamunify.models import RosterMember
+
+if TYPE_CHECKING:
+    from hytek_tools.teamunify.validation import RosterValidation
 
 _BIRTHDAY_FORMAT = "%m/%d/%Y"
 _GENDER_MAP = {"M": Gender.MALE, "F": Gender.FEMALE}
@@ -35,6 +39,12 @@ class RosterLoader:
     def by_id_card(self) -> dict[str, RosterMember]:
         """Return members keyed by normalized ID card."""
         return dict(self._by_id_card_index)
+
+    def validate(self) -> RosterValidation:
+        """Validate the roster export and return findings."""
+        from hytek_tools.teamunify.validation import validate_roster
+
+        return validate_roster(self._path)
 
     def _load_members(self) -> list[RosterMember]:
         members: list[RosterMember] = []

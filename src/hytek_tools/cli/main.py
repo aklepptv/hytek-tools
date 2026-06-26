@@ -12,6 +12,7 @@ from hytek_tools.teamunify.match_report import (
     build_match_report_from_files,
     format_match_report,
 )
+from hytek_tools.teamunify.validation import format_roster_validation, validate_roster
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -54,12 +55,31 @@ def _build_parser() -> argparse.ArgumentParser:
         required=True,
         help="path to a TeamUnify roster CSV export",
     )
+
+    roster_parser = subparsers.add_parser(
+        "roster",
+        help="validate a TeamUnify roster CSV export",
+    )
+    roster_parser.add_argument(
+        "file",
+        type=Path,
+        help="path to a TeamUnify roster CSV export",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "roster":
+        roster_file: Path = args.file
+        if not roster_file.is_file():
+            print(f"error: file not found: {roster_file}", file=sys.stderr)
+            return 1
+        validation = validate_roster(roster_file)
+        sys.stdout.write(format_roster_validation(validation))
+        return 0
 
     if args.command == "match-report":
         cl2_path: Path = args.cl2
@@ -70,8 +90,8 @@ def main(argv: list[str] | None = None) -> int:
         if not roster_path.is_file():
             print(f"error: file not found: {roster_path}", file=sys.stderr)
             return 1
-        report = build_match_report_from_files(cl2_path, roster_path)
-        sys.stdout.write(format_match_report(report))
+        match_report = build_match_report_from_files(cl2_path, roster_path)
+        sys.stdout.write(format_match_report(match_report))
         return 0
 
     path: Path = args.file
