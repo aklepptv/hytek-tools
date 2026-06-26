@@ -6,6 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from hytek_tools.inspect.cl2_diff import compare_cl2_files, format_cl2_diff
 from hytek_tools.inspect.hy3_dump import HY3RecordInspector, format_dump
 from hytek_tools.inspect.hy3_stats import count_record_types, format_record_counts
 from hytek_tools.parsers.cl2.extractor import (
@@ -130,12 +131,42 @@ def _build_parser() -> argparse.ArgumentParser:
         required=True,
         help="path for the updated CL2 meet file",
     )
+
+    diff_cl2_parser = subparsers.add_parser(
+        "diff-cl2",
+        help="compare two CL2 files byte-for-byte",
+    )
+    diff_cl2_parser.add_argument(
+        "--original",
+        type=Path,
+        required=True,
+        help="path to the original CL2 meet file",
+    )
+    diff_cl2_parser.add_argument(
+        "--new",
+        type=Path,
+        required=True,
+        help="path to the updated CL2 meet file",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "diff-cl2":
+        diff_original_path: Path = args.original
+        diff_new_path: Path = args.new
+        if not diff_original_path.is_file():
+            print(f"error: file not found: {diff_original_path}", file=sys.stderr)
+            return 1
+        if not diff_new_path.is_file():
+            print(f"error: file not found: {diff_new_path}", file=sys.stderr)
+            return 1
+        diff_report = compare_cl2_files(diff_original_path, diff_new_path)
+        sys.stdout.write(format_cl2_diff(diff_report))
+        return 0
 
     if args.command == "fix-cl2":
         fix_cl2_path: Path = args.cl2
