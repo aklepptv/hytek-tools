@@ -13,7 +13,6 @@ from hytek_tools.parsers.cl2.record import Record
 # Layout follows SDIF v3 D0; CL2 uses a three-character "D01" prefix.
 _NAME = slice(11, 39)
 _TEAMUNIFY_ID = slice(39, 53)
-_ATTACH = slice(51, 52)
 _BIRTH_DATE = slice(55, 63)
 _AGE = slice(63, 65)
 _GENDER = slice(65, 66)
@@ -51,7 +50,7 @@ def decode_d01_line(
         raise ValueError(msg)
 
     last_name, first_name = _parse_name(_slice(raw_text, _NAME))
-    teamunify_id = _parse_teamunify_id(_slice(raw_text, _TEAMUNIFY_ID))
+    teamunify_id = parse_teamunify_id(_slice(raw_text, _TEAMUNIFY_ID))
     middle_initial = _middle_initial_from_teamunify_id(teamunify_id)
     if middle_initial is None:
         middle_initial = _middle_initial_from_name(first_name)
@@ -134,11 +133,15 @@ def _parse_gender(value: str) -> Gender | None:
     return None
 
 
-def _parse_teamunify_id(value: str) -> str | None:
+def parse_teamunify_id(value: str) -> str | None:
+    """Parse a TeamUnify ID from a D01 fixed-width field."""
     stripped = value.strip()
     if not stripped or not stripped[0].isdigit():
         return None
     return stripped
+
+
+TEAMUNIFY_ID_FIELD = _TEAMUNIFY_ID
 
 
 def _middle_initial_from_teamunify_id(teamunify_id: str | None) -> str | None:

@@ -22,6 +22,7 @@ from hytek_tools.teamunify.match_report import (
     format_match_report,
 )
 from hytek_tools.teamunify.validation import format_roster_validation, validate_roster
+from hytek_tools.writers.cl2 import fix_cl2_teamunify_ids, format_fix_cl2_summary
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -106,12 +107,53 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="print detailed comparison output for the first 20 swimmers",
     )
+
+    fix_cl2_parser = subparsers.add_parser(
+        "fix-cl2",
+        help="write TeamUnify IDs into CL2 D01 records",
+    )
+    fix_cl2_parser.add_argument(
+        "--cl2",
+        type=Path,
+        required=True,
+        help="path to a CL2 meet file",
+    )
+    fix_cl2_parser.add_argument(
+        "--roster",
+        type=Path,
+        required=True,
+        help="path to a TeamUnify roster CSV export",
+    )
+    fix_cl2_parser.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="path for the updated CL2 meet file",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "fix-cl2":
+        fix_cl2_path: Path = args.cl2
+        fix_roster_path: Path = args.roster
+        fix_output_path: Path = args.output
+        if not fix_cl2_path.is_file():
+            print(f"error: file not found: {fix_cl2_path}", file=sys.stderr)
+            return 1
+        if not fix_roster_path.is_file():
+            print(f"error: file not found: {fix_roster_path}", file=sys.stderr)
+            return 1
+        result = fix_cl2_teamunify_ids(
+            fix_cl2_path,
+            fix_roster_path,
+            fix_output_path,
+        )
+        sys.stdout.write(format_fix_cl2_summary(result))
+        return 0
 
     if args.command == "compare":
         compare_cl2_path: Path = args.cl2

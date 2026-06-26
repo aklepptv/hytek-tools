@@ -45,5 +45,6 @@ __all__ = [
     "group_swimmers_by_identity",
     "read_swimmers",
     "summarize_swimmers",
+    "swimmer_identity_key",
     "unique_swimmers",
 ]
