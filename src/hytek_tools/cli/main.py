@@ -14,6 +14,11 @@ from hytek_tools.parsers.cl2.extractor import (
     CL2SwimmerExtractor,
     format_swimmer_summary,
 )
+from hytek_tools.teamunify.audit import (
+    build_identity_audit_report_from_files,
+    format_identity_audit,
+    write_identity_audit_csv,
+)
 from hytek_tools.teamunify.compare import (
     build_compare_report_from_files,
     format_compare_debug_from_files,
@@ -160,6 +165,28 @@ def _build_parser() -> argparse.ArgumentParser:
         help="path to the updated CL2 meet file",
     )
 
+    audit_parser = subparsers.add_parser(
+        "audit",
+        help="audit CL2 swimmer identity fields against a TeamUnify roster",
+    )
+    audit_parser.add_argument(
+        "--cl2",
+        type=Path,
+        required=True,
+        help="path to a CL2 meet file",
+    )
+    audit_parser.add_argument(
+        "--roster",
+        type=Path,
+        required=True,
+        help="path to a TeamUnify roster CSV export",
+    )
+    audit_parser.add_argument(
+        "--csv",
+        type=Path,
+        help="optional path to export identity differences as CSV",
+    )
+
     trace_parser = subparsers.add_parser(
         "trace",
         help="trace all CL2 records for one swimmer",
@@ -181,6 +208,24 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "audit":
+        audit_cl2_path: Path = args.cl2
+        audit_roster_path: Path = args.roster
+        if not audit_cl2_path.is_file():
+            print(f"error: file not found: {audit_cl2_path}", file=sys.stderr)
+            return 1
+        if not audit_roster_path.is_file():
+            print(f"error: file not found: {audit_roster_path}", file=sys.stderr)
+            return 1
+        audit_report = build_identity_audit_report_from_files(
+            audit_cl2_path,
+            audit_roster_path,
+        )
+        sys.stdout.write(format_identity_audit(audit_report))
+        if args.csv is not None:
+            write_identity_audit_csv(audit_report, args.csv)
+        return 0
 
     if args.command == "trace":
         trace_cl2_path: Path = args.cl2

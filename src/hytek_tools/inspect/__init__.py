@@ -1,9 +1,14 @@
 """File inspection utilities."""
 
-from hytek_tools.inspect.cl2_diff import compare_cl2_files, format_cl2_diff
+from hytek_tools.inspect.cl2_diff import (
+    CL2DiffReport,
+    CL2RecordDiff,
+    compare_cl2_files,
+    format_cl2_diff,
+)
 from hytek_tools.inspect.cl2_trace import (
-    CL2TraceReport,
     CL2TracedRecord,
+    CL2TraceReport,
     format_cl2_trace,
     trace_cl2_swimmer,
 )

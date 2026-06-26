@@ -106,7 +106,7 @@ def format_cl2_trace(report: CL2TraceReport) -> str:
     lines = [
         "CL2 Identity Trace",
         "",
-        f'Query: {report.query_name}',
+        f"Query: {report.query_name}",
         f"Records found: {len(report.records)}",
         "",
     ]
@@ -127,7 +127,7 @@ def parse_swimmer_name_query(name: str) -> tuple[str, str]:
     """Parse a swimmer query like ``Nathan Kleppinger`` into first and last name."""
     parts = name.strip().split()
     if len(parts) < 2:
-        msg = f'name query must include first and last name: {name!r}'
+        msg = f"name query must include first and last name: {name!r}"
         raise ValueError(msg)
     return " ".join(parts[:-1]), parts[-1]
 
@@ -163,9 +163,7 @@ def _format_identity_occurrences(
         for record_label, value, byte_offset in occurrences:
             offset_label = "?" if byte_offset is None else str(byte_offset)
             value_label = "(none)" if value is None else value
-            lines.append(
-                f"    {record_label} @{offset_label}: {value_label}"
-            )
+            lines.append(f"    {record_label} @{offset_label}: {value_label}")
         lines.append("")
     return lines
 
@@ -266,7 +264,7 @@ def _parse_d01_identity(
         ("last_name", decoded.last_name),
         ("first_name", decoded.first_name),
         ("middle_initial", _format_optional(decoded.middle_initial)),
-        ("birth_date", _format_date(decoded.birth_date)),
+        ("birth_date", _format_optional(_format_date(decoded.birth_date))),
         ("age", _format_optional(decoded.age)),
         ("gender", _format_optional(decoded.gender.value if decoded.gender else None)),
         ("registration_id", _format_optional(registration_id)),
@@ -325,7 +323,7 @@ def _parse_f01_identity(
         ("last_name", last_name),
         ("first_name", first_name),
         ("middle_initial", _format_optional(middle_initial)),
-        ("birth_date", _format_date(birth_date)),
+        ("birth_date", _format_optional(_format_date(birth_date))),
         ("registration_id", _format_optional(registration_id)),
     )
     identity_fields = (
@@ -415,7 +413,7 @@ def _parse_f01_name(raw_text: str) -> tuple[str, str, str | None, int]:
 def _clean_f01_last_name(value: str) -> str:
     parts = re.findall(r"[A-Z][a-z]+(?:'[A-Za-z]+)?", value)
     if parts:
-        return parts[-1]
+        return str(parts[-1])
     return value
 
 

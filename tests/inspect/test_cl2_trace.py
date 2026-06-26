@@ -57,7 +57,8 @@ def test_trace_cl2_swimmer_finds_nathan_records_on_sample(
 
     assert len(report.records) == 5
     assert {entry.record_type for entry in report.records} == {"D01", "F0", "G0"}
-    assert all(entry.first_name == "Nathan" for entry in report.records)
+    assert report.first_name == "Nathan"
+    assert report.last_name == "Kleppinger"
     assert all(
         entry.parsed_fields[1][1] == "Kleppinger"
         for entry in report.records
