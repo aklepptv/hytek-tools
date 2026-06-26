@@ -137,10 +137,10 @@ def test_build_match_report_from_sample_files(
     report = build_match_report_from_files(sample_cl2_path, roster_path)
 
     assert report.total_swimmers == 258
-    assert len(report.exact_matches) == 99
+    assert len(report.exact_matches) == 100
     assert len(report.missing_id_cards) == 1
     assert report.ambiguous_matches == ()
-    assert len(report.unmatched_swimmers) == 158
+    assert len(report.unmatched_swimmers) == 157
     assert report.missing_id_cards[0].swimmer.last_name == "Groff"
 
 

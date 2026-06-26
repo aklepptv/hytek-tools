@@ -44,7 +44,25 @@ def test_decode_d01_line_swimmer_fields() -> None:
         birth_date=date(2013, 3, 1),
         age=13,
         gender=Gender.MALE,
+        teamunify_id=None,
+        middle_initial=None,
     )
+
+
+def test_decode_d01_parses_embedded_teamunify_id() -> None:
+    line = (
+        "D01        Dalton, Charlotte           050415CHARDAA   0504201511FF  504  7 "
+        "111206232026                              45.07Y     2 5     0       0  04  "
+        "   XNN99"
+    )
+
+    swimmer = decode_d01_line(line, line_number=678)
+
+    assert swimmer.last_name == "Dalton"
+    assert swimmer.first_name == "Charlotte"
+    assert swimmer.birth_date == date(2015, 5, 4)
+    assert swimmer.teamunify_id == "050415CHARDAA"
+    assert swimmer.middle_initial == "R"
 
 
 def test_decode_d01_parses_apostrophe_last_name() -> None:

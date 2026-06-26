@@ -8,6 +8,10 @@ from pathlib import Path
 
 from hytek_tools.inspect.hy3_dump import HY3RecordInspector, format_dump
 from hytek_tools.inspect.hy3_stats import count_record_types, format_record_counts
+from hytek_tools.parsers.cl2.extractor import (
+    CL2SwimmerExtractor,
+    format_swimmer_summary,
+)
 from hytek_tools.teamunify.match_report import (
     build_match_report_from_files,
     format_match_report,
@@ -65,12 +69,31 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="path to a TeamUnify roster CSV export",
     )
+
+    swimmers_parser = subparsers.add_parser(
+        "swimmers",
+        help="summarize swimmers in a CL2 meet file",
+    )
+    swimmers_parser.add_argument(
+        "file",
+        type=Path,
+        help="path to a CL2 meet file",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "swimmers":
+        cl2_file: Path = args.file
+        if not cl2_file.is_file():
+            print(f"error: file not found: {cl2_file}", file=sys.stderr)
+            return 1
+        summary = CL2SwimmerExtractor(cl2_file).summarize()
+        sys.stdout.write(format_swimmer_summary(summary))
+        return 0
 
     if args.command == "roster":
         roster_file: Path = args.file

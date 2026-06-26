@@ -25,9 +25,9 @@ def test_match_report_command(
     captured = capsys.readouterr()
     assert exit_code == 0
     assert "Match Report" in captured.out
-    assert "Exact matches (99)" in captured.out
+    assert "Exact matches (100)" in captured.out
     assert "Missing ID Cards (1)" in captured.out
-    assert "Unmatched swimmers (158)" in captured.out
+    assert "Unmatched swimmers (157)" in captured.out
     assert captured.err == ""
 
 
