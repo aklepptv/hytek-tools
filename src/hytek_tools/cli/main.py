@@ -12,6 +12,11 @@ from hytek_tools.parsers.cl2.extractor import (
     CL2SwimmerExtractor,
     format_swimmer_summary,
 )
+from hytek_tools.teamunify.compare import (
+    build_compare_report_from_files,
+    format_compare_debug_from_files,
+    format_compare_report,
+)
 from hytek_tools.teamunify.match_report import (
     build_match_report_from_files,
     format_match_report,
@@ -79,12 +84,57 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="path to a CL2 meet file",
     )
+
+    compare_parser = subparsers.add_parser(
+        "compare",
+        help="compare CL2 swimmers to a TeamUnify roster",
+    )
+    compare_parser.add_argument(
+        "--cl2",
+        type=Path,
+        required=True,
+        help="path to a CL2 meet file",
+    )
+    compare_parser.add_argument(
+        "--roster",
+        type=Path,
+        required=True,
+        help="path to a TeamUnify roster CSV export",
+    )
+    compare_parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="print detailed comparison output for the first 20 swimmers",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "compare":
+        compare_cl2_path: Path = args.cl2
+        compare_roster_path: Path = args.roster
+        if not compare_cl2_path.is_file():
+            print(f"error: file not found: {compare_cl2_path}", file=sys.stderr)
+            return 1
+        if not compare_roster_path.is_file():
+            print(f"error: file not found: {compare_roster_path}", file=sys.stderr)
+            return 1
+        comparison = build_compare_report_from_files(
+            compare_cl2_path,
+            compare_roster_path,
+        )
+        if args.debug:
+            sys.stdout.write(
+                format_compare_debug_from_files(
+                    compare_cl2_path,
+                    compare_roster_path,
+                )
+            )
+        sys.stdout.write(format_compare_report(comparison))
+        return 0
 
     if args.command == "swimmers":
         cl2_file: Path = args.file

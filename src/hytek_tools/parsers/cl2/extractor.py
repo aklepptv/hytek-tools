@@ -81,6 +81,12 @@ def summarize_swimmers(swimmers: Sequence[CL2Swimmer]) -> CL2SwimmerSummary:
     )
 
 
+def unique_swimmers(swimmers: Sequence[CL2Swimmer]) -> tuple[CL2Swimmer, ...]:
+    """Return one representative swimmer per identity."""
+    grouped = group_swimmers_by_identity(swimmers)
+    return tuple(_representative_swimmer(group) for group in grouped.values())
+
+
 def group_swimmers_by_identity(
     swimmers: Sequence[CL2Swimmer],
 ) -> dict[CL2SwimmerIdentity, list[CL2Swimmer]]:
@@ -92,6 +98,13 @@ def group_swimmers_by_identity(
         grouped[_identity_key(swimmer)].append(swimmer)
 
     return {_identity_from_group(group): group for group in grouped.values()}
+
+
+def swimmer_identity_key(
+    swimmer: CL2Swimmer,
+) -> tuple[date | None, str, str, Gender | None]:
+    """Return the normalized identity key used to group swimmers."""
+    return _identity_key(swimmer)
 
 
 def _identity_key(swimmer: CL2Swimmer) -> tuple[date | None, str, str, Gender | None]:
@@ -111,6 +124,13 @@ def _identity_from_group(group: Sequence[CL2Swimmer]) -> CL2SwimmerIdentity:
         last_name=swimmer.last_name,
         gender=swimmer.gender,
     )
+
+
+def _representative_swimmer(group: Sequence[CL2Swimmer]) -> CL2Swimmer:
+    for swimmer in group:
+        if swimmer.teamunify_id is not None:
+            return swimmer
+    return group[0]
 
 
 def format_swimmer_summary(summary: CL2SwimmerSummary) -> str:

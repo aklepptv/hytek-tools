@@ -13,6 +13,7 @@ from hytek_tools.parsers.cl2.extractor import (
     format_swimmer_summary,
     group_swimmers_by_identity,
     summarize_swimmers,
+    unique_swimmers,
 )
 from hytek_tools.parsers.cl2.models import (
     CL2DuplicateIdentity,
@@ -44,4 +45,5 @@ __all__ = [
     "group_swimmers_by_identity",
     "read_swimmers",
     "summarize_swimmers",
+    "unique_swimmers",
 ]

@@ -1,5 +1,17 @@
 """TeamUnify roster import and identity matching."""
 
+from hytek_tools.teamunify.compare import (
+    CompareEntry,
+    CompareReport,
+    CompareStatus,
+    build_compare_entries,
+    build_compare_report,
+    build_compare_report_from_files,
+    format_compare_debug,
+    format_compare_debug_from_files,
+    format_compare_report,
+    load_unique_swimmers,
+)
 from hytek_tools.teamunify.match_report import (
     MatchCategory,
     MatchReport,
@@ -19,6 +31,9 @@ from hytek_tools.teamunify.validation import (
 )
 
 __all__ = [
+    "CompareEntry",
+    "CompareReport",
+    "CompareStatus",
     "MatchCategory",
     "MatchReport",
     "MatchReportEntry",
@@ -28,10 +43,17 @@ __all__ = [
     "RosterValidation",
     "RosterMatcher",
     "RosterMember",
+    "build_compare_report",
+    "build_compare_report_from_files",
+    "build_compare_entries",
     "build_match_report",
     "build_match_report_from_files",
+    "format_compare_debug",
+    "format_compare_debug_from_files",
+    "format_compare_report",
     "format_match_report",
     "format_roster_validation",
+    "load_unique_swimmers",
     "read_roster",
     "validate_roster",
 ]
