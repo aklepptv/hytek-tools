@@ -142,6 +142,7 @@ def parse_teamunify_id(value: str) -> str | None:
 
 
 TEAMUNIFY_ID_FIELD = _TEAMUNIFY_ID
+NAME_FIELD = _NAME
 
 
 def _middle_initial_from_teamunify_id(teamunify_id: str | None) -> str | None:

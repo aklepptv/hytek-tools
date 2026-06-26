@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from hytek_tools.inspect.cl2_diff import compare_cl2_files, format_cl2_diff
+from hytek_tools.inspect.cl2_trace import format_cl2_trace, trace_cl2_swimmer
 from hytek_tools.inspect.hy3_dump import HY3RecordInspector, format_dump
 from hytek_tools.inspect.hy3_stats import count_record_types, format_record_counts
 from hytek_tools.parsers.cl2.extractor import (
@@ -23,7 +24,12 @@ from hytek_tools.teamunify.match_report import (
     format_match_report,
 )
 from hytek_tools.teamunify.validation import format_roster_validation, validate_roster
-from hytek_tools.writers.cl2 import fix_cl2_teamunify_ids, format_fix_cl2_summary
+from hytek_tools.writers.cl2 import (
+    fix_cl2_middle_initials,
+    fix_cl2_teamunify_ids,
+    format_fix_cl2_middle_initial_summary,
+    format_fix_cl2_summary,
+)
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -131,6 +137,11 @@ def _build_parser() -> argparse.ArgumentParser:
         required=True,
         help="path for the updated CL2 meet file",
     )
+    fix_cl2_parser.add_argument(
+        "--middle-initial",
+        action="store_true",
+        help="write roster middle initials into CL2 D01 name fields",
+    )
 
     diff_cl2_parser = subparsers.add_parser(
         "diff-cl2",
@@ -148,12 +159,41 @@ def _build_parser() -> argparse.ArgumentParser:
         required=True,
         help="path to the updated CL2 meet file",
     )
+
+    trace_parser = subparsers.add_parser(
+        "trace",
+        help="trace all CL2 records for one swimmer",
+    )
+    trace_parser.add_argument(
+        "--cl2",
+        type=Path,
+        required=True,
+        help="path to a CL2 meet file",
+    )
+    trace_parser.add_argument(
+        "--name",
+        required=True,
+        help='swimmer name query, for example "Nathan Kleppinger"',
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the HYTEK Tools CLI."""
     args = _build_parser().parse_args(argv)
+
+    if args.command == "trace":
+        trace_cl2_path: Path = args.cl2
+        if not trace_cl2_path.is_file():
+            print(f"error: file not found: {trace_cl2_path}", file=sys.stderr)
+            return 1
+        try:
+            trace_report = trace_cl2_swimmer(trace_cl2_path, args.name)
+        except ValueError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
+        sys.stdout.write(format_cl2_trace(trace_report))
+        return 0
 
     if args.command == "diff-cl2":
         diff_original_path: Path = args.original
@@ -178,12 +218,22 @@ def main(argv: list[str] | None = None) -> int:
         if not fix_roster_path.is_file():
             print(f"error: file not found: {fix_roster_path}", file=sys.stderr)
             return 1
-        result = fix_cl2_teamunify_ids(
+        if args.middle_initial:
+            middle_initial_result = fix_cl2_middle_initials(
+                fix_cl2_path,
+                fix_roster_path,
+                fix_output_path,
+            )
+            sys.stdout.write(
+                format_fix_cl2_middle_initial_summary(middle_initial_result)
+            )
+            return 0
+        teamunify_id_result = fix_cl2_teamunify_ids(
             fix_cl2_path,
             fix_roster_path,
             fix_output_path,
         )
-        sys.stdout.write(format_fix_cl2_summary(result))
+        sys.stdout.write(format_fix_cl2_summary(teamunify_id_result))
         return 0
 
     if args.command == "compare":
