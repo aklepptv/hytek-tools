@@ -8,7 +8,7 @@ import pytest
 from hytek_tools.models.enums import Gender
 from hytek_tools.models.swimmer import Swimmer
 from hytek_tools.teamunify import MatchResult, RosterMatcher, read_roster
-from hytek_tools.teamunify.roster import RosterMember
+from hytek_tools.teamunify.models import RosterMember
 
 
 @pytest.fixture

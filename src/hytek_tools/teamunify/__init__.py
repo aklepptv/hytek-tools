@@ -9,13 +9,15 @@ from hytek_tools.teamunify.match_report import (
     format_match_report,
 )
 from hytek_tools.teamunify.matcher import MatchResult, RosterMatcher
-from hytek_tools.teamunify.roster import RosterMember, read_roster
+from hytek_tools.teamunify.models import RosterMember
+from hytek_tools.teamunify.roster import RosterLoader, read_roster
 
 __all__ = [
     "MatchCategory",
     "MatchReport",
     "MatchReportEntry",
     "MatchResult",
+    "RosterLoader",
     "RosterMatcher",
     "RosterMember",
     "build_match_report",

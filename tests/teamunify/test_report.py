@@ -16,7 +16,7 @@ from hytek_tools.teamunify.match_report import (
     format_match_report,
 )
 from hytek_tools.teamunify.matcher import MatchResult
-from hytek_tools.teamunify.roster import RosterMember
+from hytek_tools.teamunify.models import RosterMember
 
 
 @pytest.fixture

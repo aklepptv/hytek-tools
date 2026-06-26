@@ -11,7 +11,8 @@ from pathlib import Path
 from hytek_tools.models.swimmer import Swimmer
 from hytek_tools.parsers.cl2.swimmers import read_swimmers
 from hytek_tools.teamunify.matcher import MatchResult, RosterMatcher
-from hytek_tools.teamunify.roster import RosterMember, read_roster
+from hytek_tools.teamunify.models import RosterMember
+from hytek_tools.teamunify.roster import read_roster
 
 
 class MatchCategory(Enum):

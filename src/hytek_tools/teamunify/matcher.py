@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from hytek_tools.models.swimmer import Swimmer
-from hytek_tools.teamunify.roster import RosterMember
+from hytek_tools.teamunify.models import RosterMember
 
 
 @dataclass(frozen=True, slots=True)
